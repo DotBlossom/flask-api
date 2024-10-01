@@ -1,0 +1,18 @@
+# Python 3.10 기반 이미지
+FROM python:3.10.14-slim
+
+# 작업 디렉토리 설정
+WORKDIR /app
+
+# 필요 패키지 설치
+COPY process.txt ./
+RUN pip install --no-cache-dir -r process.txt
+
+# process.py 파일 복사
+COPY process.py ./
+
+# Flask 애플리케이션 실행
+CMD ["python", "process.py"]
+
+# 포트 개방
+EXPOSE 5001
