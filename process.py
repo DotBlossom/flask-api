@@ -6,6 +6,7 @@ app = Flask(__name__)
 # 전역 변수로 주소 저장
 address_box = None
 
+# GPU 서버로 이미지 전송
 @app.route('/flaskapi/<int:id>', methods=['POST'])
 def send_to_gpu_server(id):
     global address_box  # 전역 변수 사용
@@ -16,7 +17,7 @@ def send_to_gpu_server(id):
     image_file = request.files['image']
 
     # OCR URL
-    ocr_url = 'http://127.0.0.1:5000/ocr'
+    ocr_url = 'http://ocr-api:5000/ocr'
     
     # 이미지 파일을 OCR에 맞춰 변환(dict 형식)
     files = {'image': (image_file.filename, image_file, image_file.content_type)}
