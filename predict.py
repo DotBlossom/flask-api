@@ -4,8 +4,8 @@ import requests
 
 predict_bp = Blueprint('predict', __name__)
 
-#react에서 오면, 보내주자 .. 굳이 이 포트에서 ..? 
-@predict_bp.route('/flaskapi/predict/<long:receiptId>/<int:order>', methods=['POST'])
+#ㄴㄴ
+@predict_bp.route('/flaskapi/predict/<int:receiptId>/<int:order>', methods=['POST'])
 def response_predict_request(receiptId, order):
     
     data = request.get_json()
