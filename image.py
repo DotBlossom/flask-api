@@ -5,41 +5,59 @@ from dotenv import load_dotenv
 import os
 
 load_dotenv()  # .env 파일 로드
-google_secret_key = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS') 
-bucket_name = os.environ.get('GOOGLE_BUCKET_NAME') 
+bucket_name = "pj3-payday"
 
 upload_bp = Blueprint('upload', __name__)
+download_bp = Blueprint('download', __name__)
+
 send_predict_request_bp = Blueprint('predict', __name__)
 
 # upload는 그냥 뭐 통채로 .. 해도 .. 일단은 단일 코드
-@upload_bp.route('/flaskapi/upload/<long:receiptId>/<int:order>', methods=['POST'])
-def upload_image(receiptId, order):
+@upload_bp.route('/flaskapi/upload/<int:roomId>', methods=['POST'])
+def upload_image(roomId):
     if 'image' not in request.files:
         return jsonify({'description': 'No image file provided'}), 400
 
-    #Type: blob(form_data)
-    image_file = request.files['image']
-    
+    # bucket Connections
+    KEY_PATH = os.environ.get('GOOGLE_APPLICATION_PATH')
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = KEY_PATH
     
     storage_client = storage.Client()
     bucket = storage_client.bucket(bucket_name)
     
-    blob = bucket.blob(image_file.filename)
-    blob.upload_from_file(image_file)
+
+    #Type: blob(form_data)
+    images = request.files.getlist('image')
+    uploaded_image_urls = []
     
-    uploaded_image_url = f"https://storage.googleapis.com/{bucket_name}/{image_file.filename}"
-
-    # task validations 
+    for image in images:
+        # try 구현 할수도 있음
+        content_type = image.content_type
+        blob = bucket.blob(image.filename)
+        blob.upload_from_file(image, content_type=content_type)
     
+        uploaded_image_urls.append(blob.public_url);
 
-    # image_uploaded.send(image, receiptId=receiptId, imageUrl=uploaded_image_url, order=order)
 
-    return jsonify({'imageUrl': uploaded_image_url}), 200
+   
+    return jsonify({'imageUrl': uploaded_image_urls}), 200
 
 
 # 버튼 하나 더 만들자.. 최종 보내기 .. 재 업로드 or 나머지만 보내기 .. 
 # 된다면 로딩 ㄱㄱ 
 
+#@download_bp.route('/flaskapi/download' )
+
+
+
+
+
+'''
+original_filename = image.filename_, 
+            file_extension = os.path.splitext(original_filename)
+            new_filename = f"{uuid.uuid4()}{file_extension}"
+
+'''
 
 '''
 # signal 처리, 복잡도 감소
